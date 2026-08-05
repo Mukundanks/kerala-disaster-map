@@ -1,5 +1,7 @@
 # Kerala Disaster Map
 
+**Live at: https://mukundanks.github.io/kerala-disaster-map/**
+
 An interactive map of Kerala where you click a district or local body (a
 panchayat, municipality, or corporation) and see its disaster management
 details right there — instead of hunting through a separate page for each
@@ -52,10 +54,12 @@ Early stage, but the core map works. What's live right now:
 
 Plain HTML, CSS, and JavaScript — no framework, no build step. The map
 itself is powered by [Leaflet](https://leafletjs.com/), an open-source
-mapping library. The plan is for it to be hosted on GitHub Pages, since
-that's a natural fit for a static site with an open contribution process
-— everything here is static files, including the vector tile layer below,
-so no server-side component is needed.
+mapping library. Hosted on [GitHub Pages](https://mukundanks.github.io/kerala-disaster-map/),
+since that's a natural fit for a static site with an open contribution
+process — everything here is static files, including the vector tile
+layers below, so no server-side component is needed. Pages is configured
+to deploy straight from the `main` branch root (no build step there
+either) — see the repo's Settings → Pages if that ever needs changing.
 
 The one exception to "plain Leaflet" is the **Landslide Zones** layer,
 which has two renderers built in, for the reasons explained in depth in
