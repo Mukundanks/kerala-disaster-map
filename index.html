@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kerala Disaster Map</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Kerala Disaster Map</h1>
+    <p>Click a district or local body on the map to see its disaster management details.</p>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__section">
+        <label class="sidebar__label" for="layer-select">Boundary layer</label>
+        <select id="layer-select" class="sidebar__select">
+          <option value="state">State</option>
+          <option value="district" selected>District</option>
+          <option value="taluk">Taluk</option>
+          <option value="panchayat">Panchayats</option>
+          <option value="ward" disabled>Ward (coming soon)</option>
+        </select>
+      </div>
+
+      <div class="sidebar__section">
+        <span class="sidebar__label">Flood Layer</span>
+        <label class="sidebar__checkbox">
+          <input type="checkbox" id="toggle-flood-risk" />
+          Flood Risk
+        </label>
+        <div class="sidebar__slider-group">
+          <input
+            type="range"
+            id="flood-year-slider"
+            class="sidebar__slider"
+            min="0"
+            max="4"
+            step="1"
+            value="0"
+            list="flood-year-ticks"
+          />
+          <datalist id="flood-year-ticks">
+            <option value="0"></option>
+            <option value="1"></option>
+            <option value="2"></option>
+            <option value="3"></option>
+            <option value="4"></option>
+          </datalist>
+          <p id="flood-year-label" class="sidebar__status">1-in-10 Year Flood Zone</p>
+        </div>
+      </div>
+
+      <div class="sidebar__section">
+        <span class="sidebar__label">Hazard layers</span>
+        <label class="sidebar__checkbox">
+          <input type="checkbox" id="toggle-landslide" />
+          Landslide Zones
+        </label>
+        <label class="sidebar__checkbox">
+          <input type="checkbox" id="toggle-vulnerable-schools" />
+          Vulnerable Schools
+          <span class="sidebar__hint">no data yet</span>
+        </label>
+      </div>
+
+      <div class="sidebar__section">
+        <button type="button" id="locate-me" class="sidebar__button">Find My Location</button>
+        <p id="locate-status" class="sidebar__status"></p>
+      </div>
+    </aside>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- protomaps-leaflet: Canvas (CPU) renderer for the landslide layer -
+       kept as the fallback path for devices without solid WebGL support.
+       See js/README.md ("Why MapLibre for the landslide layer"). -->
+  <script src="https://unpkg.com/protomaps-leaflet@4.0.1/dist/protomaps-leaflet.js"></script>
+  <!-- MapLibre GL JS + maplibre-gl-leaflet: WebGL (GPU) renderer - the
+       primary path for the landslide layer. maplibre-gl is pinned to 5.x
+       because maplibre-gl-leaflet@0.1.3 doesn't yet support MapLibre 6.x
+       (its peerDependencies cap out at ^5.0.0). -->
+  <script src="https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js"></script>
+  <script src="https://unpkg.com/pmtiles@4.4.1/dist/pmtiles.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/geolocation.js"></script>
+  <script src="js/facilities.js"></script>
+  <script src="js/landslide-tiles.js"></script>
+  <script src="js/flood-tiles.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+name: README sync check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-readmes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Check that changed folders updated their README
+        run: node scripts/check-readmes.js --range origin/${{ github.base_ref }}...HEAD

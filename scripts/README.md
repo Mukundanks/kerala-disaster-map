@@ -1,0 +1,78 @@
+# scripts/
+
+Developer tooling. Nothing here is loaded by the website itself — these
+are one-off/maintenance scripts contributors run to keep the repo and its
+data in good shape. Mostly Node.js, plus a few Python data-processing
+scripts (see below) where that was the right tool for the job.
+
+## What's here
+
+- **check-readmes.js** — the script that enforces the "every folder's
+  README.md must stay in sync" rule described in `CONTRIBUTING.md`. It
+  looks at which files changed (either your staged changes, or the diff
+  for a pull request) and fails if a folder's contents changed without its
+  `README.md` also changing. This same script is run both by the GitHub
+  Actions check (`.github/workflows/readme-check.yml`) and by the local
+  pre-commit hook below, so the rule is enforced the same way everywhere.
+- **install-git-hooks.js** — run this once after cloning
+  (`node scripts/install-git-hooks.js`) to set up `check-readmes.js` as a
+  local pre-commit hook. After that, `git commit` will stop you if you've
+  changed a folder's files without updating its README.
+- **round-geojson-precision.js** — rounds coordinates in a GeoJSON file to
+  a fixed number of decimal places (default 6) and re-saves it without
+  extra whitespace, to cut file size without visibly changing shapes.
+  Used when vendoring boundary data into `data/boundaries/` — see that
+  folder's README. Usage:
+  `node scripts/round-geojson-precision.js <input.geojson> <output.geojson> [decimals]`
+
+- **process_landslides.py** — reads the 13 district landslide-susceptibility
+  shapefiles in `downloads/landslide-shapefiles/`, merges and reprojects
+  them, and packages them as a PMTiles vector-tile archive at
+  `data/landslide.pmtiles`. Needed because that source data is extremely
+  fragmented (one district alone has 30,000+ separate tiny polygons), so a
+  plain merged GeoJSON comes out to 100+ MB — tiling means the browser
+  only downloads the handful of tiles actually on screen. Full details,
+  including why tile generation starts at zoom 8 rather than 0, are in the
+  script's own docstring. Requires `geopandas`, `shapely`, `rtree`,
+  `mercantile`, `mapbox-vector-tile`, and `pmtiles`
+  (`pip install geopandas shapely rtree mercantile mapbox-vector-tile pmtiles`).
+  Usage: `python scripts/process_landslides.py`
+
+- **process_floods.py** — reads the historical flood return-probability
+  rasters (10/25/50/100/200-year, GeoTIFF, continuous depth values) from
+  `downloads/flood-return-probability/`, binarizes each to a
+  flooded/not-flooded mask (vectorizing by exact depth value would
+  fragment far worse — see the script's docstring), vectorizes to
+  polygons, and writes one file per return period directly into `data/`:
+  `flood_10yr.geojson` … `flood_200yr.geojson`. Prints a summary table
+  (polygon count, vertex count, file size, time) per file when run.
+  Requires `geopandas`, `rasterio`, `shapely`
+  (`pip install geopandas rasterio shapely`).
+  Usage: `python scripts/process_floods.py`
+
+  These GeoJSON files are the intermediate/source form (~90 MB total) and
+  are gitignored, same as `downloads/` — see `convert_floods_to_pmtiles.py`
+  below for the versions actually meant to ship on the site.
+
+- **convert_floods_to_pmtiles.py** — converts each of the 5 GeoJSON files
+  `process_floods.py` produces into its own PMTiles vector-tile archive in
+  `data/pmtiles/` (e.g. `data/pmtiles/flood_10yr.pmtiles`), reusing
+  `process_landslides.py`'s tiling approach and the same zoom range
+  (8-13). Shrinks each file from ~17-19 MB of plain GeoJSON down to
+  ~2.5 MB of tiles — and a visitor only ever fetches the handful of tiles
+  for their current view, not the whole archive. Requires `geopandas`,
+  `shapely`, `rtree`, `mercantile`, `mapbox-vector-tile`, and `pmtiles`
+  (same as `process_landslides.py`).
+  Usage: `python scripts/convert_floods_to_pmtiles.py`
+
+  These are the files `js/flood-tiles.js` actually renders (via the
+  "Flood Risk" checkbox and return-period slider in the sidebar).
+
+The Node scripts above have no dependencies (only Node's built-ins, so
+nothing to `npm install`); the three Python scripts need a `pip install`
+first (see each one's entry above for exactly which packages).
+
+## Notes for contributors
+
+If you add a new script here, explain what it does and how it's meant to
+be run, right here in this README.
