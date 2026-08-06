@@ -110,6 +110,7 @@ kerala-disaster-map/
 ├── datasummary.md           Inventory of raw hazard data staged in downloads/ (see below)
 ├── robots.txt               Tells search engine crawlers the site is crawlable, points to sitemap.xml
 ├── sitemap.xml              Lists the site's page(s) for search engines
+├── googleaf6d8aefb34335dc.html  Google Search Console site-ownership verification file
 ├── .gitignore
 ├── css/                      Stylesheets
 │   ├── README.md
