@@ -108,6 +108,8 @@ kerala-disaster-map/
 ├── README.md                This file
 ├── CONTRIBUTING.md          How to contribute, and the README-sync rule
 ├── datasummary.md           Inventory of raw hazard data staged in downloads/ (see below)
+├── robots.txt               Tells search engine crawlers the site is crawlable, points to sitemap.xml
+├── sitemap.xml              Lists the site's page(s) for search engines
 ├── .gitignore
 ├── css/                      Stylesheets
 │   ├── README.md
