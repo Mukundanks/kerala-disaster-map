@@ -16,4 +16,9 @@ GitHub-specific automation.
 This folder is exempt from the README-sync check itself — GitHub already
 gives workflow files their own dedicated, self-explanatory location and
 UI, so forcing a README edit on every workflow tweak would just be noise.
-We still keep this README for anyone browsing the repo.
+We still keep this file for anyone browsing the repo.
+
+It's named `CONTENTS.md`, not `README.md`, on purpose: GitHub prefers a
+`.github/README.md` over the root one when picking what to render on the
+repo's homepage, which would bury the actual project README. Naming it
+something else avoids that clash while still documenting the folder.

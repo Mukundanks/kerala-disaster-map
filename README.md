@@ -142,14 +142,16 @@ kerala-disaster-map/
 │   ├── process_floods.py        Builds data/flood_*yr.geojson from raw depth rasters
 │   └── convert_floods_to_pmtiles.py  Builds data/pmtiles/flood_*yr.pmtiles from those GeoJSON files
 └── .github/
-    ├── README.md
+    ├── CONTENTS.md           Not README.md on purpose — see the file itself for why
     └── workflows/
         └── readme-check.yml    CI check that runs check-readmes.js on every PR
 ```
 
 Every folder above has its own `README.md` explaining what's in it, kept
 up to date as the folder changes — see `CONTRIBUTING.md` for how that's
-enforced.
+enforced. The one exception is `.github/`, which uses `CONTENTS.md`
+instead so GitHub renders the root `README.md` as the repo's homepage
+(GitHub prefers `.github/README.md` over the root one when both exist).
 
 ## Getting started (for contributors)
 
