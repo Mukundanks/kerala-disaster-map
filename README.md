@@ -107,6 +107,7 @@ kerala-disaster-map/
 ├── index.html              Entry point: the page that loads the map
 ├── README.md                This file
 ├── CONTRIBUTING.md          How to contribute, and the README-sync rule
+├── LICENSE                  MIT License
 ├── datasummary.md           Inventory of raw hazard data staged in downloads/ (see below)
 ├── robots.txt               Tells search engine crawlers the site is crawlable, points to sitemap.xml
 ├── sitemap.xml              Lists the site's page(s) for search engines
@@ -195,3 +196,7 @@ automated check, since `downloads/` itself isn't tracked by git.
 - Flood return-probability data (historical, 10/25/50/100/200-year):
   via [KSDMA's hazard-maps page](https://sdma.kerala.gov.in/hazard-maps/)
   — see `datasummary.md` for the exact source links.
+
+## License
+
+This project's own code is licensed under the [MIT License](./LICENSE).
