@@ -25,6 +25,12 @@ scripts (see below) where that was the right tool for the job.
   folder's README. Usage:
   `node scripts/round-geojson-precision.js <input.geojson> <output.geojson> [decimals]`
 
+- **build-place-index.js** — builds `data/boundaries/places.json`, the
+  name-only search index (every district, taluk, and local body, with
+  Malayalam names where available) used by the landing page's "Check my
+  area" search. Re-run it whenever a boundary file in `data/boundaries/`
+  changes. Usage: `node scripts/build-place-index.js`
+
 - **process_landslides.py** — reads the 13 district landslide-susceptibility
   shapefiles in `downloads/landslide-shapefiles/`, merges and reprojects
   them, and packages them as a PMTiles vector-tile archive at

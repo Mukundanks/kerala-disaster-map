@@ -1,0 +1,639 @@
+/* Landing page (index.html) only - the map page uses style.css. Colour
+   tokens come from theme.css, the search box from search.css. */
+
+:root {
+  --gutter: clamp(1rem, 4vw, 3rem);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--accent);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--laterite);
+}
+
+/* --- Top bar --- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 0.8rem var(--gutter);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar__brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.topbar__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+.topbar__links a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.topbar__links a:hover {
+  color: var(--ink);
+}
+
+.topbar__links .topbar__cta {
+  color: #fff;
+  background: var(--ink);
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .topbar__links .topbar__cta {
+    color: var(--paper);
+  }
+}
+
+/* --- Buttons --- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.98rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .button {
+    color: var(--paper);
+  }
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.button--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+@media (prefers-color-scheme: dark) {
+  .button--ghost {
+    color: var(--ink);
+  }
+}
+
+.button__dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--district-hover);
+  box-shadow: 0 0 0 0 var(--district-hover);
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--district-hover) 60%, transparent); }
+  100% { box-shadow: 0 0 0 0.6rem transparent; }
+}
+
+/* --- Hero --- */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 2rem 4rem;
+  align-items: center;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 5rem) var(--gutter) clamp(2rem, 5vw, 4rem);
+}
+
+.hero h1 {
+  font-size: clamp(2.6rem, 6.5vw, 4.75rem);
+  margin-bottom: 1.25rem;
+}
+
+.hero__lede {
+  max-width: 34rem;
+  margin: 0 0 1.75rem;
+  color: var(--ink-2);
+  font-size: 1.15rem;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* --- Stats --- */
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2.25rem;
+  margin: 2.5rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.stats dt {
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+
+.stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Kerala district map --- */
+
+.kerala {
+  position: relative;
+  margin: 0;
+  justify-self: center;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.kerala__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.kerala__district {
+  fill: var(--district);
+  stroke: var(--paper);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill 0.18s ease, transform 0.18s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: rise 0.6s ease forwards;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+.kerala__district:hover,
+.kerala__district:focus-visible,
+.kerala__district.is-active {
+  fill: var(--district-hover);
+  outline: none;
+}
+
+.kerala__district:hover,
+.kerala__district:focus-visible {
+  transform: scale(1.03);
+}
+
+@keyframes rise {
+  from { opacity: 0; translate: 0 6px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+.kerala__tip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 12px));
+}
+
+.kerala__caption {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  min-height: 1.4em;
+}
+
+/* --- Sections --- */
+
+.flood,
+.layers {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 5.5rem) var(--gutter);
+}
+
+.flood {
+  border-top: 1px solid var(--line);
+}
+
+.section-head {
+  max-width: 44rem;
+  margin-bottom: 2.25rem;
+}
+
+.section-head h2 {
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  margin-bottom: 1rem;
+}
+
+.section-head p:not(.eyebrow) {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+/* --- Flood demo --- */
+
+.flood__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.flood__map-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flood__map {
+  flex: 1;
+  min-height: 22rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: var(--paper-2);
+}
+
+/* Mute the basemap so the flood layer reads clearly, and cross-fade
+   between return periods (see setupFloodDemo() in js/landing.js). */
+.flood__map .leaflet-tile-pane > .leaflet-layer:first-child {
+  filter: saturate(0.35) contrast(0.9);
+}
+
+.flood__map .leaflet-layer {
+  transition: opacity 0.35s ease;
+}
+
+.flood__map-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+
+.flood__panel {
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.flood__slider-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.flood__slider {
+  width: 100%;
+  margin: 0.9rem 0 0.25rem;
+  accent-color: var(--flood);
+  cursor: pointer;
+}
+
+.flood__ticks {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.flood__scenario {
+  margin: 1.5rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--flood);
+}
+
+.odds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.odds__item {
+  display: flex;
+  flex-direction: column;
+}
+
+.odds__value {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.odds__label {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+
+.odds__bar {
+  height: 0.5rem;
+  margin: 1.25rem 0 1.75rem;
+  border-radius: 999px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.odds__fill {
+  height: 100%;
+  width: 26%;
+  border-radius: inherit;
+  background: var(--flood);
+  transition: width 0.35s ease;
+}
+
+.flood__panel .button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* --- Layer cards --- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: var(--ink-2);
+}
+
+.card h3 {
+  font-size: 1.4rem;
+}
+
+.card p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-2);
+}
+
+.card__status {
+  align-self: flex-start;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
+
+.card__status--live {
+  background: color-mix(in srgb, #2ea043 18%, transparent);
+  color: #2b8a3e;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card__status--live {
+    color: #6fdc8c;
+  }
+}
+
+.card__link {
+  margin-top: auto;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.card--soon {
+  border-style: dashed;
+}
+
+.card__visual {
+  height: 4.5rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.card__visual--landslide {
+  display: flex;
+}
+
+.card__visual--landslide span {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.4rem 0.5rem;
+  background: var(--c);
+  color: #1a1a1a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: flex 0.25s ease;
+}
+
+.card:hover .card__visual--landslide span:first-child {
+  flex: 1.8;
+}
+
+.card__visual--flood {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  background: var(--paper-2);
+  padding: 0 0.5rem;
+}
+
+.card__visual--flood span {
+  flex: 1;
+  height: var(--h);
+  background: var(--flood);
+  opacity: 0.4;
+  border-radius: 4px 4px 0 0;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover .card__visual--flood span {
+  opacity: 0.85;
+}
+
+.card__visual--flood span:nth-child(2) { transition-delay: 40ms; }
+.card__visual--flood span:nth-child(3) { transition-delay: 80ms; }
+.card__visual--flood span:nth-child(4) { transition-delay: 120ms; }
+.card__visual--flood span:nth-child(5) { transition-delay: 160ms; }
+
+.card__visual--bounds {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--paper-2);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.card__visual--bounds span:nth-child(1) { color: #1f6feb; }
+.card__visual--bounds span:nth-child(2) { color: #2ea043; }
+.card__visual--bounds span:nth-child(3) { color: #f0883e; }
+
+.card__visual--soon {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--paper-2) 0 10px,
+    transparent 10px 20px
+  );
+}
+
+/* --- Footer --- */
+
+.footer {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 2rem var(--gutter) 3rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+
+.footer p {
+  max-width: 50rem;
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 860px) {
+  .hero,
+  .flood__body {
+    grid-template-columns: 1fr;
+  }
+
+  .kerala {
+    max-width: 13rem;
+  }
+
+  .flood__map {
+    min-height: 18rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar__links a:not(.topbar__cta) {
+    display: none;
+  }
+
+  .odds__value {
+    font-size: 2.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .kerala__district {
+    opacity: 1;
+  }
+}

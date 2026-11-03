@@ -1,0 +1,60 @@
+/* Colour, font and shared-utility tokens used by both pages (index.html
+   and map.html), so the landing page and the map look like one site. */
+
+:root {
+  --paper: #f4f1ea;
+  --paper-2: #ebe6da;
+  --card: #fffdf8;
+  --ink: #14222e;
+  --ink-2: #4a5866;
+  --line: #d9d2c3;
+  --accent: #0b3d91;
+  --flood: #2980b9;       /* matches FLOOD_COLOR in js/flood-tiles.js */
+  --laterite: #c2552d;
+  --district: #c9d6e3;
+  --district-hover: #1f6feb;
+  --shadow: 0 1px 2px rgba(20, 34, 46, 0.06), 0 8px 24px rgba(20, 34, 46, 0.08);
+  --on-accent: #fff;
+
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Source Sans 3", "Noto Sans Malayalam", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-ml: "Noto Sans Malayalam", system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f1820;
+    --paper-2: #16222c;
+    --card: #17242f;
+    --ink: #e8e4da;
+    --ink-2: #a3afba;
+    --line: #2a3a47;
+    --accent: #7fb0ff;
+    --flood: #4fa3dc;
+    --laterite: #e2774f;
+    --district: #3d5770;
+    --district-hover: #4f95ff;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+    --on-accent: #0f1820;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* The scripts show/hide things with the hidden attribute; without this,
+   any rule that sets display (e.g. display: flex) would override it. */
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

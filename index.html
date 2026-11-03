@@ -15,97 +15,191 @@
   <meta name="twitter:title" content="Kerala Disaster Map" />
   <meta name="twitter:description" content="Interactive map of Kerala showing landslide susceptibility zones, flood risk by return period, and disaster management details for every district, taluk, and panchayat." />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Source+Sans+3:wght@400;600&family=Noto+Sans+Malayalam:wght@400;600&display=swap" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.css" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/search.css" />
+  <link rel="stylesheet" href="css/landing.css" />
 </head>
 <body>
-  <header>
-    <h1>Kerala Disaster Map</h1>
-    <p>Click a district or local body on the map to see its disaster management details.</p>
+  <nav class="topbar">
+    <a href="./" class="topbar__brand">Kerala Disaster Map</a>
+    <div class="topbar__links">
+      <a href="#flood">Flood risk</a>
+      <a href="#layers">Data</a>
+      <a href="https://github.com/Mukundanks/kerala-disaster-map">GitHub</a>
+      <a href="map.html" class="topbar__cta">Open map</a>
+    </div>
+  </nav>
+
+  <!-- Hero: search + clickable district map -->
+  <header class="hero">
+    <div class="hero__text">
+      <p class="eyebrow">Open data from KSDMA, in one map</p>
+      <h1>Know the risk<br />where you live.</h1>
+      <p class="hero__lede">
+        Landslide zones, flood extents and administrative boundaries for every
+        district, taluk and local body in Kerala. Search for your panchayat,
+        or pick a district on the map.
+      </p>
+
+      <div class="search" id="search">
+        <label for="place-search" class="visually-hidden">Search for a district, taluk, or local body</label>
+        <input
+          type="search"
+          id="place-search"
+          class="search__input"
+          placeholder="Search your panchayat or district…"
+          autocomplete="off"
+          spellcheck="false"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-controls="search-results"
+        />
+        <ul id="search-results" class="search__results" role="listbox" hidden></ul>
+      </div>
+
+      <div class="hero__actions">
+        <a href="map.html?locate=1" class="button button--ghost">
+          <span class="button__dot" aria-hidden="true"></span>Use my location
+        </a>
+        <a href="map.html" class="button">Open the full map →</a>
+      </div>
+
+      <dl class="stats">
+        <div><dt>Districts</dt><dd data-count="14">14</dd></div>
+        <div><dt>Taluks</dt><dd data-count="61">61</dd></div>
+        <div><dt>Local bodies</dt><dd data-count="1034">1,034</dd></div>
+        <div><dt>Flood scenarios</dt><dd data-count="5">5</dd></div>
+      </dl>
+    </div>
+
+    <figure class="kerala">
+      <svg id="kerala-svg" class="kerala__svg" role="group" aria-label="Map of Kerala's 14 districts. Choose one to open it on the map."></svg>
+      <div id="kerala-tip" class="kerala__tip" hidden></div>
+      <figcaption class="kerala__caption" id="kerala-caption">Hover or tap a district</figcaption>
+    </figure>
   </header>
 
-  <div class="app-layout">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar__section">
-        <label class="sidebar__label" for="layer-select">Boundary layer</label>
-        <select id="layer-select" class="sidebar__select">
-          <option value="state">State</option>
-          <option value="district" selected>District</option>
-          <option value="taluk">Taluk</option>
-          <option value="panchayat">Panchayats</option>
-          <option value="ward" disabled>Ward (coming soon)</option>
-        </select>
+  <!-- Flood return-period demo -->
+  <section class="flood" id="flood">
+    <div class="section-head">
+      <p class="eyebrow">Flood risk, explained</p>
+      <h2>A “1-in-100-year flood” isn’t once a century.</h2>
+      <p>
+        It means a flood that size has a 1% chance of happening in <em>any</em>
+        year. Drag the slider to see how far the water reaches around Aluva on
+        the Periyar in each scenario, and what the odds look like over the
+        30 years you might live in a house.
+      </p>
+    </div>
+
+    <div class="flood__body">
+      <div class="flood__map-wrap">
+        <div id="flood-demo-map" class="flood__map" aria-label="Map of flood extent around Aluva, Ernakulam"></div>
+        <p class="flood__map-note">Around Aluva, Ernakulam · KSDMA historical flood return-probability data</p>
       </div>
 
-      <div class="sidebar__section">
-        <span class="sidebar__label">Flood Layer</span>
-        <label class="sidebar__checkbox">
-          <input type="checkbox" id="toggle-flood-risk" />
-          Flood Risk
-        </label>
-        <div class="sidebar__slider-group">
-          <input
-            type="range"
-            id="flood-year-slider"
-            class="sidebar__slider"
-            min="0"
-            max="4"
-            step="1"
-            value="0"
-            list="flood-year-ticks"
-          />
-          <datalist id="flood-year-ticks">
-            <option value="0"></option>
-            <option value="1"></option>
-            <option value="2"></option>
-            <option value="3"></option>
-            <option value="4"></option>
-          </datalist>
-          <p id="flood-year-label" class="sidebar__status">1-in-10 Year Flood Zone</p>
+      <div class="flood__panel">
+        <label for="flood-demo-slider" class="flood__slider-label">Return period</label>
+        <input type="range" id="flood-demo-slider" class="flood__slider" min="0" max="4" step="1" value="3" />
+        <ol class="flood__ticks" aria-hidden="true">
+          <li>10</li><li>25</li><li>50</li><li>100</li><li>200</li>
+        </ol>
+
+        <p class="flood__scenario" id="flood-demo-title">1-in-100-year flood</p>
+
+        <div class="odds">
+          <div class="odds__item">
+            <span class="odds__value" id="odds-year">1%</span>
+            <span class="odds__label">chance in any single year</span>
+          </div>
+          <div class="odds__item">
+            <span class="odds__value" id="odds-30">26%</span>
+            <span class="odds__label">chance of at least one in 30 years</span>
+          </div>
         </div>
-      </div>
 
-      <div class="sidebar__section">
-        <span class="sidebar__label">Hazard layers</span>
-        <label class="sidebar__checkbox">
-          <input type="checkbox" id="toggle-landslide" />
-          Landslide Zones
-        </label>
-        <label class="sidebar__checkbox">
-          <input type="checkbox" id="toggle-vulnerable-schools" />
-          Vulnerable Schools
-          <span class="sidebar__hint">no data yet</span>
-        </label>
-      </div>
+        <div class="odds__bar" aria-hidden="true">
+          <div class="odds__fill" id="odds-fill"></div>
+        </div>
 
-      <div class="sidebar__section">
-        <button type="button" id="locate-me" class="sidebar__button">Find My Location</button>
-        <p id="locate-status" class="sidebar__status"></p>
+        <a href="map.html?level=district&amp;name=Ernakulam&amp;layers=flood&amp;flood=100" id="flood-demo-link" class="button">
+          See this scenario across Ernakulam →
+        </a>
       </div>
-    </aside>
+    </div>
+  </section>
 
-    <div id="map"></div>
-  </div>
+  <!-- Hazard layer cards -->
+  <section class="layers" id="layers">
+    <div class="section-head">
+      <p class="eyebrow">What’s on the map</p>
+      <h2>Each layer comes from published, open data.</h2>
+    </div>
+
+    <div class="cards">
+      <a class="card" href="map.html?level=district&amp;name=Wayanad&amp;layers=landslide">
+        <span class="card__status card__status--live">Live</span>
+        <h3>Landslide zones</h3>
+        <div class="card__visual card__visual--landslide" aria-hidden="true">
+          <span style="--c:#e3342f">High</span>
+          <span style="--c:#f0883e">Moderate</span>
+          <span style="--c:#f6c453">Low</span>
+        </div>
+        <p>Susceptibility zones mapped by the Geological Survey of India (2022) for 13 districts. Alappuzha has no source data.</p>
+        <span class="card__link">Open in Wayanad →</span>
+      </a>
+
+      <a class="card" href="map.html?level=district&amp;name=Ernakulam&amp;layers=flood&amp;flood=100">
+        <span class="card__status card__status--live">Live</span>
+        <h3>Flood risk</h3>
+        <div class="card__visual card__visual--flood" aria-hidden="true">
+          <span style="--h:30%"></span><span style="--h:45%"></span><span style="--h:60%"></span><span style="--h:78%"></span><span style="--h:95%"></span>
+        </div>
+        <p>Historical flood extent for 10, 25, 50, 100 and 200-year return periods, from KSDMA’s return-probability rasters.</p>
+        <span class="card__link">Open in Ernakulam →</span>
+      </a>
+
+      <a class="card" href="map.html?level=panchayat">
+        <span class="card__status card__status--live">Live</span>
+        <h3>Boundaries</h3>
+        <div class="card__visual card__visual--bounds" aria-hidden="true">
+          <span>14</span><span>61</span><span>1,034</span>
+        </div>
+        <p>State, district, taluk and local-body outlines, from Government of Kerala and OpenStreetMap data. Ward boundaries aren’t openly available yet.</p>
+        <span class="card__link">Browse local bodies →</span>
+      </a>
+
+      <a class="card card--soon" href="https://github.com/Mukundanks/kerala-disaster-map/blob/main/CONTRIBUTING.md">
+        <span class="card__status">Coming soon</span>
+        <h3>Schools &amp; hospitals</h3>
+        <div class="card__visual card__visual--soon" aria-hidden="true"></div>
+        <p>Markers for schools, hospitals and vulnerable schools are built into the map, but the data hasn’t been sourced yet.</p>
+        <span class="card__link">Help add the data →</span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>
+      An open-source project under the <a href="https://github.com/Mukundanks/kerala-disaster-map/blob/main/LICENSE">MIT licence</a>.
+      Hazard data from the <a href="https://sdma.kerala.gov.in/hazard-maps/">Kerala State Disaster Management Authority</a>;
+      boundaries from the Government of Kerala and © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.
+    </p>
+    <p>
+      This site is for general awareness, not official guidance. In an emergency, dial <strong>112</strong>
+      and follow instructions from KSDMA and your district administration.
+    </p>
+  </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- protomaps-leaflet: Canvas (CPU) renderer for the landslide layer -
-       kept as the fallback path for devices without solid WebGL support.
-       See js/README.md ("Why MapLibre for the landslide layer"). -->
   <script src="https://unpkg.com/protomaps-leaflet@4.0.1/dist/protomaps-leaflet.js"></script>
-  <!-- MapLibre GL JS + maplibre-gl-leaflet: WebGL (GPU) renderer - the
-       primary path for the landslide layer. maplibre-gl is pinned to 5.x
-       because maplibre-gl-leaflet@0.1.3 doesn't yet support MapLibre 6.x
-       (its peerDependencies cap out at ^5.0.0). -->
-  <script src="https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.js"></script>
-  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js"></script>
-  <script src="https://unpkg.com/pmtiles@4.4.1/dist/pmtiles.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/sidebar.js"></script>
-  <script src="js/geolocation.js"></script>
-  <script src="js/facilities.js"></script>
-  <script src="js/landslide-tiles.js"></script>
   <script src="js/flood-tiles.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/place-search.js"></script>
+  <script src="js/landing.js"></script>
 </body>
 </html>

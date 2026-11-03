@@ -1,6 +1,6 @@
 # js/
 
-The site's JavaScript, loaded directly by `index.html` (no bundler, no
+The site's JavaScript, loaded directly by `map.html` and `index.html` (no bundler, no
 build step — plain `<script>` tags, in load order). Files talk to each
 other through plain global functions (no modules) — e.g. `main.js` calls
 `initMap()` from `map.js` and passes the result to the other setup
@@ -9,67 +9,124 @@ functions.
 ## What's here
 
 - **map.js** — sets up the Leaflet map, centered on Kerala
-  (lat 10.8505, lng 76.2711, zoom 7) with an OpenStreetMap tile layer.
-  Defines `BOUNDARY_LAYERS` (state/district/taluk/panchayat/ward, one
-  color and name-lookup per level) and `showLevel(map, level)`, which
-  fetches that level's file from `data/boundaries/*.geojson` the first
-  time it's selected, caches it, and swaps it in as the only visible
-  boundary layer. Clicking a shape pops up its name. Ward has no data yet
-  (see `data/boundaries/README.md`), so it's skipped if selected.
-- **sidebar.js** — wires up the sidebar controls: the boundary-layer
-  dropdown (calls `showLevel()`) and the Vulnerable Schools hazard
-  checkbox, which fetches its file from `data/hazards/*.geojson` and
-  toggles it on the map. That file is currently an empty placeholder —
-  see `data/hazards/README.md`. (Landslide Zones and Flood Risk aren't
-  handled here — see landslide-tiles.js and flood-tiles.js.)
-- **geolocation.js** — the "Find My Location" button. Uses the browser's
-  Geolocation API to drop a marker at the user's position and pan the map
-  there; shows status/errors inline in the sidebar rather than a popup
-  alert.
+  (lat 10.8505, lng 76.2711, zoom 7), with zoom, "show all of Kerala" and
+  scale controls. `BASEMAPS` lists the base maps (muted/standard OSM,
+  Esri satellite) that `setBasemap()` switches between. `BOUNDARY_LAYERS`
+  (state/district/taluk/panchayat/ward) holds one color, hover label
+  (`nameField`), place-card details (`describe()`) and name lookup
+  (`placeName`/`placeDistrict`) per level. `showLevel(map, level)` fetches
+  that level's file from `data/boundaries/*.geojson` the first time it's
+  selected, caches it, and swaps it in as the only visible boundary layer.
+  It resolves to the layer it showed, shares one download between callers
+  asking for the same level at once, and ignores a fetch that finishes
+  after you've already switched level. Ward has no data yet (see
+  `data/boundaries/README.md`), so it's skipped.
+  Shapes highlight on hover and show their name as a tooltip.
+  `selectShape()` / `clearSelection()` manage the one selected shape and
+  fire `placeselect` / `placeclear` events on the map, which
+  `place-panel.js` and `deeplink.js` listen for. `findPlace()` finds a shape
+  by name; `findPlaceAt()` finds the shape containing a point (ray
+  casting, used by Find My Location). Also owns the two overlays on the
+  map: the loading pill (`startLoading()` / `finishLoading()`, and
+  `watchLayerLoading()` for tile layers) and the message strip
+  (`showMapMessage()` / `hideMapMessage()`). `HAZARD_MIN_ZOOM` (8) is
+  where the PMTiles hazard layers start.
+- **sidebar.js** — wires up the side panel: the boundary-level buttons
+  (`chooseLevel()` lets other code switch level the same way), the base
+  map chips, the Vulnerable Schools toggle (which fetches
+  `data/hazards/*.geojson`, currently an empty placeholder; see
+  `data/hazards/README.md`), the "zoom in to see hazard layers" message,
+  and the "Layers" button that opens the panel as a bottom sheet on
+  phones. (Landslide Zones and Flood Risk are wired up in their own files.)
+- **geolocation.js** — the "Find My Location" map button. Uses the
+  browser's Geolocation API to drop a dot with an accuracy circle, pans
+  there, and selects the shape you're in at the current boundary level.
+  Status and errors go to the message strip.
 - **facilities.js** — loads school and hospital markers from
   `data/facilities/*.geojson` with custom icons (green book for schools,
   red cross for hospitals). Those files are currently empty placeholders
   — see `data/facilities/README.md`.
-- **landslide-tiles.js** — wires up the "Landslide Zones" checkbox
-  separately from the other hazard toggles, because it's backed by real
-  data (`data/landslide.pmtiles`) that's too large/fragmented for plain
-  GeoJSON. Has **two renderers built in**: MapLibre GL JS (WebGL/GPU) and
-  protomaps-leaflet (Canvas/CPU). **Only the Canvas renderer is active
-  right now** — see "Why MapLibre for the landslide layer" below for the
-  full reasoning, current status, and a debugging log of the specific bug
+- **landslide-tiles.js** — wires up the "Landslide zones" toggle and its
+  opacity slider separately from the other hazard toggles, because it's
+  backed by real data (`data/landslide.pmtiles`) that's too
+  large/fragmented for plain GeoJSON. Has **two renderers built in**:
+  MapLibre GL JS (WebGL/GPU) and protomaps-leaflet (Canvas/CPU). **Only the
+  Canvas renderer is active right now** (and only it supports the opacity
+  slider) — see "Why MapLibre for the landslide layer" below for the full
+  reasoning, current status, and a debugging log of the specific bug
   blocking the WebGL path. `MAX_DATA_ZOOM` (13) is passed as
   `maxDataZoom` to protomaps-leaflet so the layer stays visible (reusing
   the deepest tile, scaled up) instead of disappearing once you zoom in
   past the data's native resolution. See `scripts/process_landslides.py`
   for how the tiles themselves are generated.
-- **flood-tiles.js** — wires up the "Flood Risk" checkbox and the
+- **flood-tiles.js** — wires up the "Flood risk" toggle, the
   return-period slider (10/25/50/100/200-year, five discrete steps - the
   slider's `value` is an index into `FLOOD_RETURN_PERIODS`, not the year
-  itself) under the "Flood Layer" section. Renders with protomaps-leaflet
-  (Canvas), same as the landslide layer's active renderer, fetching
+  itself), the play button that steps through them, the odds line, and
+  the opacity slider. Renders with protomaps-leaflet (Canvas), same as
+  the landslide layer's active renderer, fetching
   `data/pmtiles/flood_{year}yr.pmtiles`. One Leaflet layer per return
   period is created lazily and cached, so dragging back to an
-  already-visited value swaps to the cached layer instead of re-fetching;
-  dragging the slider only swaps the *overlay* layer, never touches
-  `initMap()`'s base map/tile layer. Uses its own `FLOOD_MAX_DATA_ZOOM`
-  constant (not landslide-tiles.js's `MAX_DATA_ZOOM`) for the same
-  overzoom reason explained there — these files share one global scope
-  (no modules), so identically-named top-level `const`s would collide.
-  See `scripts/process_floods.py` / `scripts/convert_floods_to_pmtiles.py`
+  already-visited value swaps to the cached layer instead of re-fetching.
+  `floodOdds(year)` gives the chance of that flood in one year (1/N) and
+  at least once in 30 years (1 - (1 - 1/N)^30); the landing page uses it
+  too. Uses its own `FLOOD_MAX_DATA_ZOOM` constant (not
+  landslide-tiles.js's `MAX_DATA_ZOOM`) for the same overzoom reason
+  explained there — these files share one global scope (no modules), so
+  identically-named top-level `const`s would collide. See
+  `scripts/process_floods.py` / `scripts/convert_floods_to_pmtiles.py`
   for how the tiles themselves are generated.
-- **main.js** — the entry point. Waits for the page to finish loading,
-  then calls `initMap()` and wires the sidebar, geolocation, facilities,
-  landslide-tiles, and flood-tiles setup functions to the resulting map.
+- **place-search.js** — the "find a place" search box shared by both
+  pages: loads `data/boundaries/places.json` the first time it's needed,
+  ranks matches (exact, prefix, word start, anywhere; English or
+  Malayalam), and handles the dropdown, arrow keys, Enter and Escape.
+  `setupPlaceSearch({ input, list, onSelect, onActive })` leaves what a
+  selection does up to the page.
+- **place-panel.js** — the map page's place card (shown on
+  `placeselect`, with "Zoom to", "Copy link" and Wikidata links; closed by
+  its × button, Escape, or clicking empty map), its search box, and
+  `goToPlace()`, which switches level, finds a place by name and selects
+  it.
+- **deeplink.js** — URL parameters for the map page: `level`,
+  `name` + `district` (select one shape), `layers=flood,landslide`,
+  `flood=<return period>`, `basemap`, and `locate=1`. The full list is in
+  the file header. `applyDeepLink()` sets the panel controls and fires
+  their normal events, so the panel always matches the map.
+  `setupUrlSync()` writes the same parameters back (with `replaceState`)
+  whenever the panel or the selection changes, so the address bar is
+  always a shareable link to the current view. E.g.
+  `map.html?level=panchayat&name=Aluva&district=Ernakulam&layers=flood&flood=100`.
+- **main.js** — the map page's entry point. Waits for the page to finish
+  loading, reads the deep link, calls `initMap()` with its level, runs
+  every setup function above against the resulting map, then applies the
+  rest of the deep link.
+- **landing.js** — everything interactive on the landing page
+  (`index.html`): the clickable SVG of the 14 districts (drawn from
+  `data/boundaries/district.geojson` with a simple projection, no map
+  library), the "Check my area" search (`place-search.js`, opening the
+  result on the map page), the count-up stats, and the flood
+  return-period demo. The demo is a small Leaflet map around Aluva that
+  reuses `flood-tiles.js`'s `FLOOD_RETURN_PERIODS`, `floodPmtilesUrl()`,
+  `floodPaintRules()` and `floodOdds()`, adds all five periods at once and
+  cross-fades between them with `setOpacity()` so dragging doesn't flash,
+  and only starts fetching tiles once scrolled near. Everything links into
+  `map.html` using `deeplink.js`'s parameters.
 
 ## Load order
 
-`index.html` loads, in order: Leaflet library → protomaps-leaflet library
+`map.html` loads, in order: Leaflet library → protomaps-leaflet library
 → MapLibre GL JS → maplibre-gl-leaflet (the bridge that lets a MapLibre
 layer live inside a Leaflet map) → pmtiles (so MapLibre can read a
 `.pmtiles` file directly) → `map.js` → `sidebar.js` → `geolocation.js` →
-`facilities.js` → `landslide-tiles.js` → `flood-tiles.js` → `main.js`.
-Each file after the libraries defines functions that `main.js` calls, so
-it has to load last.
+`facilities.js` → `landslide-tiles.js` → `flood-tiles.js` →
+`place-search.js` → `place-panel.js` → `deeplink.js` → `main.js`. Each
+file after the libraries defines functions that `main.js` calls, so it
+has to load last.
+
+`index.html` (the landing page) loads only: Leaflet → protomaps-leaflet →
+`flood-tiles.js` (for its constants, paint rules and `floodOdds()`; its
+`setupFloodToggle()` isn't called there) → `place-search.js` →
+`landing.js`.
 
 ## Why MapLibre for the landslide layer
 
@@ -162,12 +219,12 @@ code that ran this layer before and is independently known to work. See
 the `supportsWebGL()` / `fallBackToCanvas()` logic in that file.
 
 **Scope.** Only the landslide layer uses MapLibre. Everything else
-(boundaries, markers, geolocation, sidebar) stays on plain Leaflet — that
+(boundaries, markers, geolocation, side panel) stays on plain Leaflet — that
 part of the app was never the performance problem, so there was no reason
 to touch it.
 
 ## Notes for contributors
 
 If you add a new JS file, remember to also add a `<script>` tag for it in
-`index.html` (in the right order), and update this README to explain what
+`map.html` or `index.html` (in the right order), and update this README to explain what
 it does.

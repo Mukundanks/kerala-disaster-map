@@ -46,4 +46,5 @@ Each file should stay a standard GeoJSON `FeatureCollection` of polygons
 
 When real hazard-zone data is added here, update this README with where
 it came from (source + license, same as `data/boundaries/README.md`) and
-remove the "no data yet" hint for that layer in `index.html`.
+remove the "no data yet" hint for that layer in `map.html` (and the
+"Coming soon" card on the landing page, `index.html`).

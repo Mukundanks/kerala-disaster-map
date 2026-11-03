@@ -1,0 +1,97 @@
+/* "Find a place" search box (js/place-search.js), shared by index.html
+   and map.html. Uses the tokens in theme.css. */
+
+.search {
+  position: relative;
+  max-width: 34rem;
+}
+
+.search__input {
+  width: 100%;
+  padding: 0.95rem 1.2rem 0.95rem 2.9rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23778' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='8.5' cy='8.5' r='6'/%3E%3Cpath d='m13 13 5 5'/%3E%3C/svg%3E")
+    no-repeat 1rem center;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.05rem;
+  box-shadow: var(--shadow);
+}
+
+.search__input:focus {
+  outline: 2px solid var(--district-hover);
+  outline-offset: 1px;
+}
+
+.search__results {
+  position: absolute;
+  z-index: 1100; /* above Leaflet's panes and controls on map.html */
+  top: calc(100% + 0.4rem);
+  left: 0;
+  right: 0;
+  max-height: 22rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.search__result {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.search__result[aria-selected="true"] {
+  background: var(--paper-2);
+}
+
+.search__name {
+  font-weight: 600;
+}
+
+.search__name mark {
+  background: none;
+  color: var(--district-hover);
+}
+
+.search__ml {
+  margin-left: 0.4rem;
+  font-family: var(--font-ml);
+  font-weight: 400;
+  font-size: 0.9em;
+  color: var(--ink-2);
+}
+
+.search__meta {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+  text-align: right;
+}
+
+.search__empty {
+  padding: 0.6rem 0.8rem;
+  color: var(--ink-2);
+}
+
+@media (max-width: 520px) {
+  .search__result {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .search__meta {
+    text-align: left;
+  }
+}

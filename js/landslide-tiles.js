@@ -107,7 +107,10 @@ function buildLandslidePaintRules() {
   }));
 }
 
+// The opacity slider (#landslide-opacity) is only wired up here - the
+// WebGL path below would need its own handling if it's ever re-enabled.
 function setupLandslideCanvasRenderer(map, checkbox) {
+  const opacity = document.getElementById('landslide-opacity');
   let layer = null;
 
   checkbox.addEventListener('change', () => {
@@ -121,8 +124,14 @@ function setupLandslideCanvasRenderer(map, checkbox) {
         paintRules: buildLandslidePaintRules(),
         maxDataZoom: MAX_DATA_ZOOM,
       });
+      watchLayerLoading(layer, 'landslide zones');
     }
+    layer.setOpacity(Number(opacity.value) / 100);
     layer.addTo(map);
+  });
+
+  opacity.addEventListener('input', () => {
+    if (layer) layer.setOpacity(Number(opacity.value) / 100);
   });
 }
 

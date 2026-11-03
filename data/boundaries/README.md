@@ -2,8 +2,8 @@
 
 The GeoJSON files that draw the map's boundary layers — state, district,
 taluk, and panchayat/municipality/corporation. Loaded on demand by
-`js/map.js` (`BOUNDARY_LAYERS`) when you pick a level from the sidebar
-dropdown.
+`js/map.js` (`BOUNDARY_LAYERS`) when you pick a level from the map page's
+"Boundaries" buttons.
 
 ## Files, and exactly where each came from
 
@@ -14,6 +14,16 @@ dropdown.
 | `district-osm.geojson` | [geohacker/kerala](https://github.com/geohacker/kerala) (`geojsons/district.geojson`) | Same caveat as `state.geojson` above | 14 features. Kept as a secondary/cross-check copy — **not currently used by the map** (only `district.geojson` is loaded), but useful if the official source ever needs verifying against. |
 | `taluk.geojson` | [geohacker/kerala](https://github.com/geohacker/kerala) (`geojsons/taluk.geojson`) | Same caveat as `state.geojson` above | 61 features. Note: Kerala is usually cited as having 75-78 taluks depending on the year, so this dataset may be missing a few recent ones — flagged here rather than presented as complete. |
 | `panchayat.geojson` | [opendatakerala/lsg-kerala-data](https://github.com/opendatakerala/lsg-kerala-data) (`data/kerala_lsg_data.geojson`), sourced from OpenStreetMap by the OSM Kerala community | [ODbL](https://github.com/opendatakerala/lsg-kerala-data/blob/main/LICENSE.md) (OpenStreetMap® data, © OpenStreetMap contributors) | 1,034 features: 941 gram panchayats + 87 municipalities + 6 municipal corporations — matches Kerala's official local self-government count exactly. |
+
+## Generated: places.json
+
+`places.json` isn't sourced from anywhere. It's built from the files
+above by `node scripts/build-place-index.js`, as a name-only search index
+for the landing page (`index.html`). The landing page can't search
+`panchayat.geojson` directly, because that file is ~4.4 MB of geometry.
+Each entry is `[level, name, district, kind, name_ml]`. **Re-run the
+script whenever a boundary file here changes**, or search results will
+drift from what the map shows.
 
 ## Why no ward-level file
 

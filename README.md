@@ -20,30 +20,57 @@ that behind a single map: click where you are, see what applies to you.
 
 Early stage, but the core map works. What's live right now:
 
-- A sidebar with a dropdown to switch the map between **State**,
-  **District**, **Taluk**, and **Panchayat** boundary layers (**Ward** is
-  listed but disabled — see `data/boundaries/README.md` for why open ward
-  data doesn't exist yet). Clicking a shape shows its name.
-- A "Find My Location" button that uses the browser's location to drop a
-  marker on the map.
-- A **Landslide Zones** checkbox with real data (GSI, 2022) — susceptibility
-  zones colored red/orange/yellow by risk level, streamed in as vector
-  tiles (`data/landslide.pmtiles`) so the browser only downloads what's
-  on screen instead of one huge file, and stays visible (reusing the
-  deepest available tile) at zoom levels beyond the data's own resolution
-  instead of disappearing. Currently rendered with a CPU (Canvas) renderer;
-  a GPU (WebGL/MapLibre) renderer also exists in the code for better
-  performance on this dataset's ~295,000 fragmented polygons, but is
-  disabled pending a rendering bug — see `js/README.md` ("Why MapLibre for
-  the landslide layer") for the full reasoning and debugging notes. See
-  also `data/README.md` and `scripts/process_landslides.py`.
-- A **Flood Risk** checkbox with a return-period slider (10/25/50/100/
-  200-year historical flood extent, one PMTiles archive per period —
-  `data/pmtiles/flood_*yr.pmtiles`) — shown in semi-transparent blue,
-  dragging the slider swaps the active layer without touching the base
-  map. See `data/README.md` and `scripts/process_floods.py` /
-  `scripts/convert_floods_to_pmtiles.py`.
-- A **Vulnerable Schools** checkbox, and marker support for schools
+- A **landing page** (`index.html`) with a "Check my area" search over
+  every district, taluk, and local body (English or Malayalam names), a
+  clickable map of the 14 districts, a flood return-period slider demo
+  showing real flood extent around Aluva alongside the odds of that flood
+  in a given year and over 30 years, and cards for each data layer. All of
+  it links into the map page (`map.html`) through URL parameters that open
+  it already zoomed to a place and/or with layers switched on (see
+  `js/deeplink.js`).
+
+- The **map page** (`map.html`): a full-screen map with a side panel
+  (a pull-up sheet on phones), in the same look as the landing page,
+  including dark mode. In the panel:
+  - **Boundaries** buttons to switch between **State**, **District**,
+    **Taluk**, and **Local body** (panchayat/municipality/corporation)
+    outlines. **Ward** is listed but disabled; see
+    `data/boundaries/README.md` for why open ward data doesn't exist yet.
+    Hovering a shape highlights it and shows its name. Clicking it opens
+    a **place card** with its Malayalam name, type, district and block,
+    plus "Zoom to" and "Copy link" buttons.
+  - **Landslide zones** (GSI, 2022): susceptibility zones colored
+    red/orange/yellow by risk level, with a legend and an opacity slider.
+    They stream in as vector tiles (`data/landslide.pmtiles`), so the
+    browser only downloads what's on screen instead of one huge file. They
+    stay visible (reusing the deepest available tile) at zoom levels beyond
+    the data's own resolution instead of disappearing. Currently rendered
+    with a CPU (Canvas) renderer. A GPU (WebGL/MapLibre) renderer also
+    exists in the code, for better performance on this dataset's ~295,000
+    fragmented polygons, but is disabled pending a rendering bug. See
+    `js/README.md` ("Why MapLibre for the landslide layer") for the full
+    reasoning and debugging notes, and also `data/README.md` and
+    `scripts/process_landslides.py`.
+  - **Flood risk**: a return-period slider (10/25/50/100/200-year historical
+    flood extent, one PMTiles archive per period,
+    `data/pmtiles/flood_*yr.pmtiles`) with a play button that steps through
+    the periods. It shows the odds of each scenario (in one year, and over
+    30 years) and has an opacity slider. See `data/README.md` and
+    `scripts/process_floods.py` / `scripts/convert_floods_to_pmtiles.py`.
+  - A **Base map** choice: Muted (the default, toned down so hazard colours
+    stand out), Standard OpenStreetMap, or Satellite.
+- A **place search** in the map page's top bar (the same one as on the
+  landing page), which switches to the right boundary level and selects the
+  place.
+- Map buttons for zoom, "show all of Kerala", and **Find My Location**.
+  Find My Location drops a marker with an accuracy circle and selects the
+  district/taluk/local body you're in.
+- The landslide and flood tiles only exist from zoom 8, so if one is
+  switched on while zoomed out further, a message offers to zoom in. A
+  loading indicator shows while boundary files or hazard tiles download.
+- The address bar always holds a link to the current view (level, selected
+  place, layers, flood period, base map), so any view can be shared.
+- A **Vulnerable Schools** toggle, and marker support for schools
   (green book icon) and hospitals (red cross icon) — wired up, but no
   real data behind them yet (see `data/hazards/README.md` and
   `data/facilities/README.md`).
@@ -104,30 +131,39 @@ where each file came from.
 
 ```
 kerala-disaster-map/
-├── index.html              Entry point: the page that loads the map
+├── index.html              Landing page: search, district picker, flood demo, layer cards
+├── map.html                The interactive map itself (accepts deep-link URL parameters)
 ├── README.md                This file
 ├── CONTRIBUTING.md          How to contribute, and the README-sync rule
 ├── LICENSE                  MIT License
 ├── datasummary.md           Inventory of raw hazard data staged in downloads/ (see below)
 ├── robots.txt               Tells search engine crawlers the site is crawlable, points to sitemap.xml
-├── sitemap.xml              Lists the site's page(s) for search engines
+├── sitemap.xml              Lists the site's pages (landing + map) for search engines
 ├── googleaf6d8aefb34335dc.html  Google Search Console site-ownership verification file
 ├── .gitignore
 ├── css/                      Stylesheets
 │   ├── README.md
-│   └── style.css
+│   ├── theme.css                Shared colours, fonts, dark mode (both pages)
+│   ├── search.css               Shared place-search box
+│   ├── style.css                Map page styles
+│   └── landing.css              Landing page styles
 ├── js/                       JavaScript that runs the site
 │   ├── README.md
-│   ├── map.js                  Sets up the Leaflet map + boundary layers
-│   ├── sidebar.js               Wires up the dropdown + Vulnerable-Schools checkbox
-│   ├── geolocation.js           "Find My Location" button
+│   ├── map.js                  Leaflet map, base maps, boundary layers, selection, loading/messages
+│   ├── sidebar.js               Side panel: level buttons, base map, zoom hint, phone sheet
+│   ├── geolocation.js           "Find My Location" map button
 │   ├── facilities.js            School/hospital markers
-│   ├── landslide-tiles.js       Landslide Zones checkbox (PMTiles vector tiles)
-│   ├── flood-tiles.js           Flood Risk checkbox + return-period slider (PMTiles)
-│   └── main.js                  Entry point that boots everything on page load
+│   ├── landslide-tiles.js       Landslide Zones toggle + opacity (PMTiles vector tiles)
+│   ├── flood-tiles.js           Flood Risk toggle, return-period slider, play, odds (PMTiles)
+│   ├── place-search.js          Shared place search (both pages)
+│   ├── place-panel.js           Map page: place card + search box
+│   ├── deeplink.js              Reads/writes map.html URL parameters
+│   ├── main.js                  Entry point that boots the map page
+│   └── landing.js               Landing page: district SVG, search, flood demo
 ├── data/                      All the data that powers the map
 │   ├── README.md
 │   ├── boundaries/              State/district/taluk/panchayat shapes (populated)
+│   │   ├── places.json            Name-only search index for the landing page (generated)
 │   │   └── README.md              Full source + license for each file
 │   ├── hazards/                 Vulnerable-school overlay (empty so far)
 │   │   └── README.md

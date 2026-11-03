@@ -5,7 +5,9 @@ All the data that powers the map.
 - **[boundaries/](boundaries/README.md)** — the state/district/taluk/panchayat
   boundary shapes the sidebar lets you switch between. This is populated
   and sourced from official/open datasets — see that README for exactly
-  where each file came from and its license.
+  where each file came from and its license. Also holds `places.json`,
+  the small search index the landing page's "Check my area" box uses,
+  generated from those boundary files.
 - **[hazards/](hazards/README.md)** — vulnerable-schools overlay, toggled
   from its sidebar checkbox. Currently an empty placeholder; real data
   hasn't been sourced yet.
