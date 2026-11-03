@@ -8,7 +8,9 @@ All the data that powers the map.
   where each file came from and its license. Also holds `places.json`,
   the small search index the landing page's "Check my area" box uses,
   generated from those boundary files.
-- **[hazards/](hazards/README.md)** — vulnerable-schools overlay, toggled
+- **[hazards/](hazards/README.md)** — the landslide "not assessed" overlay and
+  per-place landslide coverage figures (both generated), and the
+  vulnerable-schools overlay, toggled
   from its sidebar checkbox. Currently an empty placeholder; real data
   hasn't been sourced yet.
 - **[facilities/](facilities/README.md)** — school and hospital point

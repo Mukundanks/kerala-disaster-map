@@ -313,6 +313,48 @@ button {
   background: var(--c);
 }
 
+/* "Not assessed" hatch (landslide layer). The pattern lives in an inline
+   <svg> in map.html and draws in currentColor, set here. */
+.pattern-defs {
+  position: absolute;
+  color: #3b4652;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pattern-defs {
+    color: #c9d2db;
+  }
+}
+
+.unassessed {
+  fill: url(#unassessed-hatch);
+}
+
+.legend__unassessed {
+  border: 1px solid var(--ink-2);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--ink-2) 0 1.5px,
+    transparent 1.5px 4px
+  ) !important;
+  opacity: 0.7;
+}
+
+.legend {
+  flex-wrap: wrap;
+  row-gap: 0.35rem;
+}
+
+.layer__note {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+
+.layer__note strong {
+  color: var(--ink);
+}
+
 .opacity {
   display: flex;
   align-items: center;
@@ -509,6 +551,61 @@ button {
   margin: 0.3rem 0 0;
   font-size: 0.85rem;
   color: var(--ink-2);
+}
+
+/* Landslide coverage block in the place card (js/place-panel.js). Each
+   bar segment's width is set from landslide-coverage.json. */
+.coverage {
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+
+.coverage__title {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.coverage__bar {
+  display: flex;
+  height: 0.6rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--paper-2);
+}
+
+.coverage__bar span {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.coverage__high { background: #e3342f; }
+.coverage__moderate { background: #f0883e; }
+.coverage__low { background: #f6c453; }
+
+.coverage__none {
+  background: repeating-linear-gradient(-45deg, var(--line) 0 2px, transparent 2px 5px);
+}
+
+.coverage__text {
+  margin: 0.45rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+
+.coverage__text strong {
+  color: var(--ink);
+}
+
+.coverage--gap .coverage__text {
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--laterite) 12%, transparent);
+  color: var(--ink);
 }
 
 .place-card__actions {

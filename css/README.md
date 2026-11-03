@@ -18,7 +18,10 @@ Stylesheets for the site.
   return-period sliders, the play button, base map chips), the overlays
   on the map (loading pill, message strip, place card), Leaflet control
   and tooltip restyling, the location dot, and the `.facility-icon`
-  marker styles for school/hospital pins. `.basemap--muted` tones down
+  marker styles for school/hospital pins. `.unassessed` fills the
+  landslide layer's "Not assessed" areas with the hatch pattern from
+  `map.html`, and `.coverage__*` styles the landslide block in the place
+  card. `.basemap--muted` tones down
   the default base map (and inverts it in dark mode). Below 720px wide the
   panel turns into a bottom sheet opened by the "Layers" button.
 - **landing.css** — the landing page (`index.html`) only: top bar, hero,

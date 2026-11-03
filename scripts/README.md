@@ -31,6 +31,19 @@ scripts (see below) where that was the right tool for the job.
   area" search. Re-run it whenever a boundary file in `data/boundaries/`
   changes. Usage: `node scripts/build-place-index.js`
 
+- **process_landslide_coverage.py** — from the same GSI shapefiles,
+  works out where the landslide mapping does and doesn't reach. Writes
+  `data/hazards/landslide-unassessed.geojson` (the hatched "Not assessed"
+  areas) and `data/hazards/landslide-coverage.json` (% mapped and
+  High/Moderate/Low for every state/district/taluk/local-body feature,
+  shown in the map's place card). Everything is rasterized onto a shared
+  50 m grid (UTM 43N) rather than intersected as vectors, which takes
+  under a minute instead of hours on ~295,000 polygons. Spot checks
+  against exact vector intersections agree to within ~2 percentage
+  points. Requires `geopandas`, `rasterio`, `shapely`, `numpy`. Re-run it
+  whenever the GSI shapefiles or `data/boundaries/` change.
+  Usage: `python scripts/process_landslide_coverage.py`
+
 - **process_landslides.py** — reads the 13 district landslide-susceptibility
   shapefiles in `downloads/landslide-shapefiles/`, merges and reprojects
   them, and packages them as a PMTiles vector-tile archive at

@@ -80,12 +80,18 @@
               <li><span style="--c:#e3342f"></span>High</li>
               <li><span style="--c:#f0883e"></span>Moderate</li>
               <li><span style="--c:#f6c453"></span>Low</li>
+              <li><span class="legend__unassessed"></span>Not assessed</li>
             </ul>
+            <p class="layer__note">
+              Hatched areas weren’t mapped by GSI, about half of Kerala. That
+              includes the coast but also some hills (e.g. around Nilambur),
+              so <strong>not assessed doesn’t mean safe</strong>.
+            </p>
             <label class="opacity">
               <span>Opacity</span>
               <input type="range" id="landslide-opacity" min="10" max="100" value="100" />
             </label>
-            <p class="layer__source">GSI, 2022 · no data for Alappuzha</p>
+            <p class="layer__source">GSI, 2022</p>
           </div>
         </div>
 
@@ -170,6 +176,13 @@
         <h2 id="place-name" class="place-card__name"></h2>
         <p id="place-name-ml" class="place-card__ml" lang="ml"></p>
         <p id="place-block" class="place-card__block"></p>
+        <div id="place-landslide" class="coverage" hidden>
+          <p class="coverage__title">Landslide susceptibility (GSI survey)</p>
+          <div class="coverage__bar" aria-hidden="true">
+            <span class="coverage__high"></span><span class="coverage__moderate"></span><span class="coverage__low"></span><span class="coverage__none"></span>
+          </div>
+          <p id="place-landslide-text" class="coverage__text"></p>
+        </div>
         <div class="place-card__actions">
           <button type="button" id="place-zoom" class="pill">Zoom to</button>
           <button type="button" id="place-copy" class="pill">Copy link</button>
@@ -178,6 +191,17 @@
       </section>
     </main>
   </div>
+
+  <!-- Hatch pattern for the landslide layer's "Not assessed" areas (see
+       setupUnassessedOverlay() in js/landslide-tiles.js). -->
+  <svg class="pattern-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="unassessed-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="9" height="9" fill="currentColor" fill-opacity="0.06" />
+        <line x1="0" y1="0" x2="0" y2="9" stroke="currentColor" stroke-width="2" stroke-opacity="0.45" />
+      </pattern>
+    </defs>
+  </svg>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- protomaps-leaflet: Canvas (CPU) renderer for the landslide layer -

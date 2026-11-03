@@ -234,6 +234,7 @@ function selectShape(map, level, shape, { fit = true } = {}) {
   map.fire('placeselect', {
     level,
     shape,
+    index: shape.feature.index,
     info: config.describe(p),
     name: config.placeName ? config.placeName(p) : null,
     district: config.placeDistrict ? config.placeDistrict(p) : null,
@@ -328,6 +329,10 @@ async function buildLevelLayer(map, level, config) {
     finishLoading(config.label.toLowerCase());
     delete levelDownloads[level];
   }
+
+  // Each feature's position in its file - the key into per-feature data
+  // generated alongside the boundaries, like landslide-coverage.json.
+  data.features.forEach((feature, i) => { feature.index = i; });
 
   loadedLayers[level] = L.geoJSON(data, {
     style: () => styleFor(config),

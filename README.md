@@ -51,6 +51,12 @@ Early stage, but the core map works. What's live right now:
     `js/README.md` ("Why MapLibre for the landslide layer") for the full
     reasoning and debugging notes, and also `data/README.md` and
     `scripts/process_landslides.py`.
+    GSI only mapped about half of Kerala. Areas it didn't map are hatched
+    **"Not assessed"** instead of left blank, since blank would read as "no
+    risk". Some gaps cover hills, e.g. Moothedam and Edakkara near Nilambur.
+    The place card says how much of a place GSI mapped and how much is
+    High/Moderate/Low. See `data/hazards/README.md` and
+    `scripts/process_landslide_coverage.py`.
   - **Flood risk**: a return-period slider (10/25/50/100/200-year historical
     flood extent, one PMTiles archive per period,
     `data/pmtiles/flood_*yr.pmtiles`) with a play button that steps through
@@ -165,7 +171,7 @@ kerala-disaster-map/
 │   ├── boundaries/              State/district/taluk/panchayat shapes (populated)
 │   │   ├── places.json            Name-only search index for the landing page (generated)
 │   │   └── README.md              Full source + license for each file
-│   ├── hazards/                 Vulnerable-school overlay (empty so far)
+│   ├── hazards/                 Landslide "not assessed" areas + coverage (generated); vulnerable-school overlay (empty)
 │   │   └── README.md
 │   ├── facilities/              School/hospital points (empty so far)
 │   │   └── README.md

@@ -17,7 +17,8 @@ functions.
   (`placeName`/`placeDistrict`) per level. `showLevel(map, level)` fetches
   that level's file from `data/boundaries/*.geojson` the first time it's
   selected, caches it, and swaps it in as the only visible boundary layer.
-  It resolves to the layer it showed, shares one download between callers
+  Each feature gets `feature.index`, its position in the file, used to
+  look up generated per-feature data. It resolves to the layer it showed, shares one download between callers
   asking for the same level at once, and ignores a fetch that finishes
   after you've already switched level. Ward has no data yet (see
   `data/boundaries/README.md`), so it's skipped.
@@ -58,7 +59,13 @@ functions.
   `maxDataZoom` to protomaps-leaflet so the layer stays visible (reusing
   the deepest tile, scaled up) instead of disappearing once you zoom in
   past the data's native resolution. See `scripts/process_landslides.py`
-  for how the tiles themselves are generated.
+  for how the tiles themselves are generated. Also draws the
+  **"Not assessed" overlay** (`setupUnassessedOverlay()`): the areas
+  GSI never mapped (`data/hazards/landslide-unassessed.geojson`), hatched
+  with the `#unassessed-hatch` SVG pattern defined in `map.html`. It's
+  drawn in its own pane under the boundary outlines, doesn't react to the
+  mouse, and only shows while the landslide layer is on and you're zoomed
+  in to `HAZARD_MIN_ZOOM` or closer.
 - **flood-tiles.js** — wires up the "Flood risk" toggle, the
   return-period slider (10/25/50/100/200-year, five discrete steps - the
   slider's `value` is an index into `FLOOD_RETURN_PERIODS`, not the year
@@ -84,7 +91,12 @@ functions.
   selection does up to the page.
 - **place-panel.js** — the map page's place card (shown on
   `placeselect`, with "Zoom to", "Copy link" and Wikidata links; closed by
-  its × button, Escape, or clicking empty map), its search box, and
+  its × button, Escape, or clicking empty map). The card includes a
+  landslide block: a bar and a sentence giving how much of the place GSI
+  mapped and how much is High/Moderate/Low, from
+  `data/hazards/landslide-coverage.json`, looked up by the feature's
+  position in its boundary file (`feature.index`, set in `map.js`). Also
+  covers its search box, and
   `goToPlace()`, which switches level, finds a place by name and selects
   it.
 - **deeplink.js** — URL parameters for the map page: `level`,
