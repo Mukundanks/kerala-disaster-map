@@ -34,7 +34,8 @@ scripts (see below) where that was the right tool for the job.
 - **process_landslide_coverage.py** — from the same GSI shapefiles,
   works out where the landslide mapping does and doesn't reach. Writes
   `data/hazards/landslide-unassessed.geojson` (the hatched "Not assessed"
-  areas) and `data/hazards/landslide-coverage.json` (% mapped and
+  areas, plus label positions on an 8 km grid inside them, coarser grid
+  lines appearing at lower zooms) and `data/hazards/landslide-coverage.json` (% mapped and
   High/Moderate/Low for every state/district/taluk/local-body feature,
   shown in the map's place card). Everything is rasterized onto a shared
   50 m grid (UTM 43N) rather than intersected as vectors, which takes

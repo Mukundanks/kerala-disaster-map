@@ -62,6 +62,11 @@ CELL = 50            # grid cell size, metres
 SIEVE_CELLS = 40     # specks smaller than this (40 cells = 0.1 km2) are cleaned out
 SIMPLIFY_M = 40      # smooths the raster staircase on the output polygons
 
+# "Not assessed" map labels (see label_points())
+LABEL_GRID_M = 8000  # finest label spacing, used from zoom 12
+LABEL_EDGE_M = 1500  # how far inside a gap a grid label must sit
+LABEL_MIN_KM2 = 3    # smaller gaps get no label
+
 # Class codes on the grid. 0 = not mapped.
 CLASSES = {"Low": 1, "Moderate": 2, "High": 3}
 
@@ -132,7 +137,49 @@ def unassessed_polygons(state, classes, transform, shape):
     gdf = gpd.GeoDataFrame.from_features(polygons, crs=CRS)
     gdf["geometry"] = gdf.geometry.simplify(SIMPLIFY_M, preserve_topology=True)
     gdf = gdf[~gdf.geometry.is_empty]
-    return gdf.dissolve().to_crs(4326)
+    return gdf.dissolve()  # still in metres (CRS) - label_points() needs that
+
+
+def label_points(gaps):
+    """
+    "Not assessed" label positions inside the gaps, each with the lowest
+    zoom it should appear at, so the map can show a sparse set zoomed out
+    and fill in as you zoom in without labels ever crowding together.
+
+    Points sit on a LABEL_GRID_M grid; every 2nd/4th/8th grid line gets an
+    earlier minzoom, giving roughly one label per ~250 px at each zoom.
+    Gaps too small to catch a grid point get one label at their visual
+    centre, if they're big enough to be worth labelling at all.
+    """
+    from shapely.geometry import Point
+    from shapely.ops import polylabel
+
+    geom = gaps.geometry.iloc[0]
+    inner = geom.buffer(-LABEL_EDGE_M)  # keep labels off the edges
+    minx, miny, maxx, maxy = geom.bounds
+
+    def grid_minzoom(i, j):
+        for step, zoom in ((8, 9), (4, 10), (2, 11)):
+            if i % step == 0 and j % step == 0:
+                return zoom
+        return 12
+
+    points = []
+    for i, x in enumerate(np.arange(minx, maxx, LABEL_GRID_M)):
+        for j, y in enumerate(np.arange(miny, maxy, LABEL_GRID_M)):
+            p = Point(x, y)
+            if inner.contains(p):
+                points.append((p, grid_minzoom(i, j)))
+
+    parts = list(geom.geoms) if geom.geom_type == "MultiPolygon" else [geom]
+    for part in parts:
+        km2 = part.area / 1e6
+        if km2 < LABEL_MIN_KM2 or any(part.contains(p) for p, _ in points):
+            continue
+        points.append((polylabel(part, tolerance=50), 10 if km2 > 50 else 11 if km2 > 10 else 12))
+
+    labels = gpd.GeoDataFrame({"minzoom": [z for _, z in points]}, geometry=[p for p, _ in points], crs=CRS)
+    return labels.to_crs(4326)
 
 
 def round_coords(value, places=5):
@@ -159,9 +206,18 @@ def main():
     print(f"Wrote {COVERAGE_OUT} ({os.path.getsize(COVERAGE_OUT) / 1024:.0f} KB)")
 
     gaps = unassessed_polygons(boundaries["state"], classes, transform, shape)
-    collection = json.loads(gaps.to_json())
+    labels = label_points(gaps)
+    print(f"{len(labels)} label points")
+
+    # One file: the gap polygon(s), then Point features marking where to
+    # put "Not assessed" labels, each with the zoom it appears from.
+    collection = json.loads(gaps.to_crs(4326).to_json())
     for feature in collection["features"]:
         feature["properties"] = {}
+    collection["features"] += json.loads(labels.to_json())["features"]
+    for feature in collection["features"]:
+        feature.pop("id", None)
+        feature.pop("bbox", None)
         feature["geometry"]["coordinates"] = round_coords(feature["geometry"]["coordinates"])
     with open(UNASSESSED_OUT, "w", encoding="utf-8") as f:
         json.dump(collection, f, separators=(",", ":"))

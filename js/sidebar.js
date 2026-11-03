@@ -112,14 +112,29 @@ function setupHazardZoomHint(map) {
 // On phones the panel is a bottom sheet over the map; this button opens
 // and closes it. On wider screens the button is hidden and the panel is
 // always shown beside the map.
+//
+// While the sheet is open, a see-through backdrop covers the map, so
+// tapping anywhere on the map closes the sheet - and only closes it,
+// rather than also selecting whatever shape was under your finger.
+// Focusing the search box or pressing Escape closes it too.
 function setupPanelToggle() {
   const button = document.getElementById('panel-toggle');
   const panel = document.getElementById('panel');
+  const backdrop = document.getElementById('panel-backdrop');
 
-  button.addEventListener('click', () => {
-    const open = button.getAttribute('aria-expanded') !== 'true';
+  const setOpen = (open) => {
     button.setAttribute('aria-expanded', String(open));
     panel.classList.toggle('is-open', open);
+    backdrop.hidden = !open;
+  };
+
+  button.addEventListener('click', () => {
+    setOpen(button.getAttribute('aria-expanded') !== 'true');
+  });
+  backdrop.addEventListener('click', () => setOpen(false));
+  document.getElementById('place-search').addEventListener('focus', () => setOpen(false));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && panel.classList.contains('is-open')) setOpen(false);
   });
 }
 

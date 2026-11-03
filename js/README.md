@@ -38,7 +38,9 @@ functions.
   `data/hazards/*.geojson`, currently an empty placeholder; see
   `data/hazards/README.md`), the "zoom in to see hazard layers" message,
   and the "Layers" button that opens the panel as a bottom sheet on
-  phones. (Landslide Zones and Flood Risk are wired up in their own files.)
+  phones. While the sheet is open, a see-through backdrop over the map
+  closes it on any tap, without also selecting the shape underneath.
+  Focusing the search box or pressing Escape closes it too. (Landslide Zones and Flood Risk are wired up in their own files.)
 - **geolocation.js** — the "Find My Location" map button. Uses the
   browser's Geolocation API to drop a dot with an accuracy circle, pans
   there, and selects the shape you're in at the current boundary level.
@@ -61,8 +63,11 @@ functions.
   past the data's native resolution. See `scripts/process_landslides.py`
   for how the tiles themselves are generated. Also draws the
   **"Not assessed" overlay** (`setupUnassessedOverlay()`): the areas
-  GSI never mapped (`data/hazards/landslide-unassessed.geojson`), hatched
-  with the `#unassessed-hatch` SVG pattern defined in `map.html`. It's
+  GSI never mapped (`data/hazards/landslide-unassessed.geojson`), greyed
+  out and hatched with the `#unassessed-hatch` SVG pattern defined in
+  `map.html`, with a dashed edge where the mapping stops and "Not assessed"
+  labels. Labels are added or removed on zoom by their `minzoom`, so only
+  a few show zoomed out. It's
   drawn in its own pane under the boundary outlines, doesn't react to the
   mouse, and only shows while the landslide layer is on and you're zoomed
   in to `HAZARD_MIN_ZOOM` or closer.

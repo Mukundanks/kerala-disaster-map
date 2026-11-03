@@ -286,6 +286,10 @@ button {
   animation: reveal 0.2s ease;
 }
 
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
 @keyframes reveal {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: none; }
@@ -313,31 +317,53 @@ button {
   background: var(--c);
 }
 
-/* "Not assessed" hatch (landslide layer). The pattern lives in an inline
-   <svg> in map.html and draws in currentColor, set here. */
-.pattern-defs {
-  position: absolute;
-  color: #3b4652;
+/* "Not assessed" areas (landslide layer): a grey wash with bold stripes,
+   a dashed edge where GSI's mapping stops, and "Not assessed" labels.
+   The pattern lives in an inline <svg> in map.html and draws in
+   currentColor, set here via --unassessed. */
+:root {
+  --unassessed: #35404c;
 }
 
 @media (prefers-color-scheme: dark) {
-  .pattern-defs {
-    color: #c9d2db;
+  :root {
+    --unassessed: #d3dbe3;
   }
+}
+
+.pattern-defs {
+  position: absolute;
+  color: var(--unassessed);
 }
 
 .unassessed {
   fill: url(#unassessed-hatch);
+  stroke: var(--unassessed);
+  stroke-opacity: 0.85;
+}
+
+.unassessed-label span {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  border: 1px dashed var(--unassessed);
+  color: var(--unassessed);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .legend__unassessed {
-  border: 1px solid var(--ink-2);
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--ink-2) 0 1.5px,
-    transparent 1.5px 4px
-  ) !important;
-  opacity: 0.7;
+  border: 1px dashed var(--unassessed);
+  background:
+    repeating-linear-gradient(-45deg, var(--unassessed) 0 2px, transparent 2px 4.5px),
+    color-mix(in srgb, var(--unassessed) 16%, transparent) !important;
+  opacity: 0.8;
 }
 
 .legend {
@@ -773,6 +799,11 @@ button {
 
 /* --- Phones: the panel becomes a bottom sheet over the map --- */
 
+/* Only used on phones (below); never shown beside the desktop panel. */
+.panel-backdrop {
+  display: none;
+}
+
 @media (max-width: 720px) {
   .appbar {
     gap: 0.6rem;
@@ -815,6 +846,17 @@ button {
 
   .panel.is-open {
     transform: none;
+  }
+
+  /* Sits over the map (and its controls and overlays) but under the
+     sheet; a tap on it closes the sheet. */
+  .panel-backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1040;
+    background: rgba(20, 34, 46, 0.18);
+    animation: fade-in 0.2s ease;
   }
 
   .place-card {

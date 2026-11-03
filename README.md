@@ -30,7 +30,7 @@ Early stage, but the core map works. What's live right now:
   `js/deeplink.js`).
 
 - The **map page** (`map.html`): a full-screen map with a side panel
-  (a pull-up sheet on phones), in the same look as the landing page,
+  (a pull-up sheet on phones, which closes when you tap the map), in the same look as the landing page,
   including dark mode. In the panel:
   - **Boundaries** buttons to switch between **State**, **District**,
     **Taluk**, and **Local body** (panchayat/municipality/corporation)
@@ -51,8 +51,9 @@ Early stage, but the core map works. What's live right now:
     `js/README.md` ("Why MapLibre for the landslide layer") for the full
     reasoning and debugging notes, and also `data/README.md` and
     `scripts/process_landslides.py`.
-    GSI only mapped about half of Kerala. Areas it didn't map are hatched
-    **"Not assessed"** instead of left blank, since blank would read as "no
+    GSI only mapped about half of Kerala. Areas it didn't map are greyed
+    out, hatched, edged with a dashed line and labelled **"Not assessed"**
+    instead of left blank, since blank would read as "no
     risk". Some gaps cover hills, e.g. Moothedam and Edakkara near Nilambur.
     The place card says how much of a place GSI mapped and how much is
     High/Moderate/Low. See `data/hazards/README.md` and

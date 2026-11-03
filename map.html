@@ -161,6 +161,10 @@
     <main class="map-wrap">
       <div id="map"></div>
 
+      <!-- Phones only: covers the map while the Layers sheet is open, so a
+           tap anywhere closes it (see setupPanelToggle() in js/sidebar.js). -->
+      <div id="panel-backdrop" class="panel-backdrop" hidden></div>
+
       <div id="map-loading" class="map-loading" role="status" hidden>
         <span class="map-loading__spinner" aria-hidden="true"></span><span class="map-loading__label"></span>
       </div>
@@ -196,9 +200,9 @@
        setupUnassessedOverlay() in js/landslide-tiles.js). -->
   <svg class="pattern-defs" width="0" height="0" aria-hidden="true" focusable="false">
     <defs>
-      <pattern id="unassessed-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-        <rect width="9" height="9" fill="currentColor" fill-opacity="0.06" />
-        <line x1="0" y1="0" x2="0" y2="9" stroke="currentColor" stroke-width="2" stroke-opacity="0.45" />
+      <pattern id="unassessed-hatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="12" height="12" fill="currentColor" fill-opacity="0.16" />
+        <line x1="0" y1="0" x2="0" y2="12" stroke="currentColor" stroke-width="3.5" stroke-opacity="0.42" />
       </pattern>
     </defs>
   </svg>

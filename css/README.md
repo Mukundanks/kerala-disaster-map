@@ -20,10 +20,12 @@ Stylesheets for the site.
   and tooltip restyling, the location dot, and the `.facility-icon`
   marker styles for school/hospital pins. `.unassessed` fills the
   landslide layer's "Not assessed" areas with the hatch pattern from
-  `map.html`, and `.coverage__*` styles the landslide block in the place
+  `map.html` and gives them a dashed edge, `.unassessed-label` styles
+  their on-map labels (colour set by `--unassessed`, light and dark), and `.coverage__*` styles the landslide block in the place
   card. `.basemap--muted` tones down
   the default base map (and inverts it in dark mode). Below 720px wide the
-  panel turns into a bottom sheet opened by the "Layers" button.
+  panel turns into a bottom sheet opened by the "Layers" button, with a
+  dimmed `.panel-backdrop` over the map that closes it when tapped.
 - **landing.css** — the landing page (`index.html`) only: top bar, hero,
   the clickable district SVG (`.kerala__*`), the flood return-period demo
   (`.flood__*`, `.odds__*`), the data-layer cards, and the footer.

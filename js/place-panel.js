@@ -136,7 +136,8 @@ function setupPlaceCard(map) {
   map.on('click', () => clearSelection(map));
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && current && !e.target.closest('input')) clearSelection(map);
+    const inInput = e.target instanceof Element && e.target.closest('input');
+    if (e.key === 'Escape' && current && !inInput) clearSelection(map);
   });
 
   closeButton.addEventListener('click', () => clearSelection(map));

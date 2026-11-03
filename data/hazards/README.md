@@ -35,7 +35,7 @@ shapefiles or the boundary files in `data/boundaries/` change.
 
 | File | Used by | What's in it |
 |---|---|---|
-| `landslide-unassessed.geojson` | Landslide layer, shown hatched as "Not assessed" (`js/landslide-tiles.js`) | Every part of Kerala that GSI's data leaves blank, about half the state, cleaned of specks under ~0.1 km². |
+| `landslide-unassessed.geojson` | Landslide layer, shown greyed out and hatched as "Not assessed" (`js/landslide-tiles.js`) | Every part of Kerala that GSI's data leaves blank, about half the state, cleaned of specks under ~0.1 km². After the polygon(s), it also holds Point features marking where to put "Not assessed" labels, each with a `minzoom`, so labels thin out when zoomed out and never crowd together. |
 | `landslide-coverage.json` | Place card on the map page (`js/place-panel.js`) | For each state/district/taluk/local-body feature, in the same order as its `data/boundaries/*.geojson` file: `[mapped, high, moderate, low]`, each as a % of the feature's area. |
 
 **Why they exist:** GSI's data only has High/Moderate/Low zones. Areas it
