@@ -88,8 +88,33 @@ scripts (see below) where that was the right tool for the job.
   These are the files `js/flood-tiles.js` actually renders (via the
   "Flood Risk" checkbox and return-period slider in the sidebar).
 
+- **scrape_ksdma.py** — checks KSDMA's
+  [hazard-maps page](https://sdma.kerala.gov.in/hazard-maps/) for what's
+  on offer: every row of the page's table, every file it links to, and
+  (with `--head`) each file's size, ETag and Last-Modified date. It never
+  downloads the files themselves and never touches git. It tags the files
+  our processing scripts use (the 13 GSI landslide zips and the 2
+  historical flood-raster zips), and exits with code 2 if those aren't
+  all there, which usually means KSDMA redesigned the page. Save a run
+  with `--out` and compare the next one with `--compare` to see
+  new, removed or replaced files (exit code 3 when something changed).
+  Links to other sites, odd ports and redirects that leave
+  `sdma.kerala.gov.in` are never followed. `--html saved.html` parses a
+  saved copy with no network access, for testing. This is the first piece
+  of the planned automated data-update pipeline; it's meant to run inside
+  the isolated update VM, not on a personal machine. Requires `requests`
+  and `beautifulsoup4`, pinned with hashes in `requirements-scrape.txt`:
+  `pip install --require-hashes --no-deps -r scripts/requirements-scrape.txt`
+  (into a venv outside the repo).
+  Usage: `python scripts/scrape_ksdma.py --head --compare last.json --out last.json`
+
+- **requirements-scrape.txt** — exact versions and SHA-256 hashes of
+  `scrape_ksdma.py`'s dependencies, so `pip` refuses anything that
+  doesn't match byte for byte. The hashes are for Python 3.14 on x86_64
+  Linux (the update VM).
+
 The Node scripts above have no dependencies (only Node's built-ins, so
-nothing to `npm install`); the three Python scripts need a `pip install`
+nothing to `npm install`); the Python scripts need a `pip install`
 first (see each one's entry above for exactly which packages).
 
 ## Notes for contributors
